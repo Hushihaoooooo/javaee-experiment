@@ -1,5 +1,5 @@
 import axios from "axios";
-import {useTokenStore} from "@/store/token";
+import {useTokenStore} from "@/stores/token";
 
 const baseURL = '/api'
 const instance = axios.create({baseURL})

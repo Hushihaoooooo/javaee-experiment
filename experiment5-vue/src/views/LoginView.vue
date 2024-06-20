@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import {User, Lock} from '@element-plus/icons-vue'
 import {ref} from 'vue'
-import axios from 'axios'
 //控制注册与登录表单的显示， 默认显示注册
 const isRegister = ref(false)
 //定义数据模型
@@ -88,8 +87,7 @@ const clearRegisterData = () => {
 
 <template>
   <el-row class="login-page">
-    <el-col :span="12" class="bg"></el-col>
-    <el-col :span="6" :offset="3" class="form">
+    <el-col :span="6" :offset="9" class="form">
       <!-- 注册表单 -->
       <el-form ref="form" size="large" autocomplete="off" v-if="isRegister" :model="registerData" :rules="rules">
         <el-form-item>
@@ -156,20 +154,11 @@ const clearRegisterData = () => {
   height: 100vh;
   background-color: #fff;
 
-  .bg {
-    background: url('/images/login.png') no-repeat center / cover;
-    border-radius: 0 20px 20px 0;
-  }
-
   .form {
     display: flex;
     flex-direction: column;
     justify-content: center;
     user-select: none;
-
-    .title {
-      margin: 0 auto;
-    }
 
     .button {
       width: 100%;
