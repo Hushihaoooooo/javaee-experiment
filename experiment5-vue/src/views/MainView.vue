@@ -54,10 +54,9 @@ const handleSelect = (index : string) => {
           active-text-color="#ffd04b"
           @select="handleSelect"
         >
-          <el-menu-item index="/home">首页</el-menu-item>
-          <el-menu-item index="/activity">活动大厅</el-menu-item>
-          <el-menu-item index="/exchange">积分兑换</el-menu-item>
-          <el-menu-item index="/user">个人信息</el-menu-item>
+          <el-menu-item index="/home">主页</el-menu-item>
+          <el-menu-item index="/userInfo">个人信息</el-menu-item>
+          <el-menu-item index="/resetPassword">修改密码</el-menu-item>
           <el-menu-item index="/login">退出登录</el-menu-item>
         </el-menu>
       </el-header>
@@ -77,4 +76,9 @@ const handleSelect = (index : string) => {
   font-size: 14px;
   color: #666;
 }
+.el-menu-demo .el-menu-item {
+  width: 150px; /* 设置菜单项的统一宽度 */
+  text-align: center; /* 居中文本 */
+}
+
 </style>
