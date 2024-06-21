@@ -10,8 +10,45 @@
     </resultMap>
     <insert id="add">
         insert into user(username, password, register_time)
-        values (#{userName}, #{password}, #{registerTime})
+        values (#{userName}, #{password}, now())
     </insert>
+
+        <update id="updateUserInfo">
+        update user
+        <set>
+            <if test="user.nickName != null">
+                nickname = #{user.nickName},
+            </if>
+            <if test="user.intro != null">
+                intro = #{user.intro},
+            </if>
+            <if test="user.gender != null">
+                gender = #{user.gender},
+            </if>
+            <if test="user.province != null">
+                province = #{user.province},
+            </if>
+            <if test="user.city != null">
+                city = #{user.city},
+            </if>
+            <if test="user.email != null">
+                email = #{user.email},
+            </if>
+            <if test="user.mobile != null">
+                mobile = #{user.mobile},
+            </if>
+            <if test="user.QQ != null">
+                QQ = #{user.QQ},
+            </if>
+        </set>
+
+        where username = #{user.userName}
+    </update>
+    <update id="updatePwd">
+        update user
+        set password = #{newPwd}
+        where username = #{userName}
+    </update>
 
     <select id="findByUserName" resultMap="userResultMap">
         select *

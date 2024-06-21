@@ -12,5 +12,7 @@ public interface UserService {
 
     void register(String userName, String password);
 
-    void changeUserInfo(User user);
+    void updateUserInfo(User user);
+
+    void updatePwd(String userName, String newPwd);
 }
