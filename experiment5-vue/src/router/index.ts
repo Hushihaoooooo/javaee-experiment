@@ -5,6 +5,7 @@ import HomeVue from '@/views/user/HomeView.vue'
 import UserInfoVue from '@/views/user/UserInfoView.vue'
 import UserResetPasswordVue from '@/views/user/UserResetPasswordView.vue'
 import UserProfileVue from '@/views/user/UserProfileView.vue'
+import PictureUploadVue from '@/views/picture/PictureUploadView.vue'
 
 const routes = [{
   path: '/login', component: LoginVue
@@ -14,6 +15,7 @@ const routes = [{
     {path: '/userInfo', component: UserInfoVue},
     {path: '/resetPassword', component: UserResetPasswordVue},
     {path: '/userProfile/:userName', component: UserProfileVue, props: true},
+    {path: '/upload', component: PictureUploadVue},
   ]
 }
 

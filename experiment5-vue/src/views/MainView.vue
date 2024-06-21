@@ -57,6 +57,7 @@ const handleSelect = (index : string) => {
           <el-menu-item index="/home">主页</el-menu-item>
           <el-menu-item index="/userInfo">个人信息</el-menu-item>
           <el-menu-item index="/resetPassword">修改密码</el-menu-item>
+          <el-menu-item index="/upload">上传照片</el-menu-item>
           <el-menu-item index="/login">退出登录</el-menu-item>
         </el-menu>
       </el-header>

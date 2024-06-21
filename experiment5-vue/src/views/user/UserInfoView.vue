@@ -5,13 +5,13 @@
       <el-form-item label="用户名" prop="userName">
         <el-input v-model="userInfo.userName" disabled />
       </el-form-item>
-      <el-form-item label="姓名" prop="userName">
+      <el-form-item label="姓名" prop="nickName">
         <el-input v-model="userInfo.nickName" placeholder="还未完善" />
       </el-form-item>
-      <el-form-item label="姓别" prop="userName">
+      <el-form-item label="姓别" prop="gender">
         <el-radio-group v-model="userInfo.gender" class="ml-4">
-          <el-radio value="1">男</el-radio>
-          <el-radio value="2">女</el-radio>
+          <el-radio :value="0">男</el-radio>
+          <el-radio :value="1">女</el-radio>
         </el-radio-group>
       </el-form-item>
 
@@ -35,22 +35,18 @@
           />
         </el-select>
       </el-form-item>
-
-      <el-form-item label="身份证号">
-        <el-input v-model="userInfo.idCard" placeholder="还未完善" />
-      </el-form-item>
       <el-form-item label="邮箱">
         <el-input v-model="userInfo.email" placeholder="还未完善" />
       </el-form-item>
       <el-form-item label="电话号码">
-        <el-input v-model="userInfo.phone" placeholder="还未完善" />
+        <el-input v-model="userInfo.mobile" placeholder="还未完善" />
       </el-form-item>
       <el-form-item label="QQ">
-        <el-input v-model="userInfo.qq" placeholder="还未完善" />
+        <el-input v-model="userInfo.QQ" placeholder="还未完善" />
       </el-form-item>
       <el-form-item label="给大家的一句话">
         <el-input
-          v-model="userInfo.bio"
+          v-model="userInfo.intro"
           style="width: 240px"
           :rows="2"
           type="textarea"
@@ -67,7 +63,7 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import { userInfoUpdateService } from '@/api/user'
+import { userInfoService, userInfoUpdateService } from '@/api/user'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserInfoStore } from '@/stores/userInfo'
 
@@ -131,10 +127,15 @@ const handleProvinceChange = (value: string) => {
   userInfo.value.province = value
   userInfo.value.city = '' // 清空城市选择
 }
-
-console.log(userInfoStore.info)
-console.log(userInfo.value)
+const getUserInfo = async () => {
+  let res = await  userInfoService();
+  console.log(res.data.data);
+  userInfoStore.setInfo(res.data.data)
+}
+getUserInfo()
 const updateUserInfo = async () => {
+  console.log("dudu")
+  console.log(userInfo.value)
   ElMessageBox.confirm(
     '你确定要修改个人信息吗？',
     '温馨提示',
@@ -152,5 +153,6 @@ const updateUserInfo = async () => {
       message: '用户取消修改'
     })
   })
+  await getUserInfo()
 }
 </script>
