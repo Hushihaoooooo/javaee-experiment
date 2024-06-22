@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shihaohu.mapper.PictureMapper">
+
+    <insert id="upload">
+        insert into picture(name, fname, user_id, upload_time)
+        values(#{customFileName}, #{fileName}, #{uploadedBy}, now())
+    </insert>
+</mapper>

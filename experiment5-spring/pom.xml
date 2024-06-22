@@ -109,17 +109,32 @@
             <artifactId>java-jwt</artifactId>
             <version>4.4.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.16.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>10.1.19</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
+
 
     <build>
         <finalName>ssm-board</finalName>
         <plugins>
-            <!-- Jetty plugin for running the web application -->
-            <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>11.0.15</version>
-            </plugin>
             <!-- Maven compiler plugin for setting Java version -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

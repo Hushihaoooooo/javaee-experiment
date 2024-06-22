@@ -1,42 +1,50 @@
-package com.example.demo.controller;
+package com.shihaohu.controller;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import com.shihaohu.model.Result;
+import com.shihaohu.service.PictureService;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/picture")
-public class UploadController {
+public class PictureController {
 
-    private static final String UPLOAD_DIR = "uploads/";
+    private static final String UPLOAD_DIR = "E:/ProjectFile/";
+
+    @Resource
+    private PictureService pictureService;
 
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadFile(
+    public Result uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam("uploadedBy") String uploadedBy,
-            @RequestParam("uploadDate") LocalDate uploadDate) {
+            @RequestParam("customFileName") String customFileName) {
+
 
         if (file.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please upload a file");
+            return Result.error("Please upload a file");
         }
 
         // Check file size
         if (file.getSize() > 500 * 1024) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File size exceeds limit");
+            return Result.error("File size exceeds limit");
         }
 
         // Check file type
         String fileType = file.getContentType();
         if (!fileType.equals("image/jpeg") && !fileType.equals("image/png")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Only jpg/png files are supported");
+            return Result.error("Only jpg/png files are supported");
         }
+
 
         try {
             // Generate unique file name
@@ -49,18 +57,22 @@ public class UploadController {
                 dir.mkdirs();
             }
 
+            System.out.println(filePath);
+            System.out.println(customFileName);
+
             // Save file
             file.transferTo(new File(filePath));
 
-            // You can save other metadata like uploadedBy and uploadDate to a database
-            // For demo purpose, just log them
+            // Log metadata
             System.out.println("Uploaded by: " + uploadedBy);
-            System.out.println("Upload date: " + uploadDate);
 
-            return ResponseEntity.ok("File uploaded successfully: " + filePath);
+
+            pictureService.upload(uploadedBy, fileName, customFileName);
+
+            return Result.success(fileName);
 
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
+            return Result.error("操作失败");
         }
     }
 }
