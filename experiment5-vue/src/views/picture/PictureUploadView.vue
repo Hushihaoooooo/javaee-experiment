@@ -1,86 +1,71 @@
 <template>
-  <el-container>
-    <el-header>Upload File</el-header>
-    <el-main>
-      <el-form :model="form" ref="uploadForm" label-width="100px">
-        <el-form-item label="File Upload">
-          <el-upload
-            v-model:file-list="fileList"
-            action="/api/upload"
-            :auto-upload="false"
-            :on-preview="handlePreview"
-            :on-remove="handleRemove"
-            list-type="picture">
-            <el-button type="primary">Click to upload</el-button>
-            <template #tip>
-              <div class="el-upload__tip">jpg/png files less than 500kb</div>
-            </template>
-          </el-upload>
-        </el-form-item>
-        <el-form-item label="Uploaded By" required>
-          <el-input v-model="form.uploadedBy"></el-input>
-        </el-form-item>
-        <el-form-item label="Upload Date" required>
-          <el-date-picker v-model="form.uploadDate" type="date"></el-date-picker>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="submitForm" :disabled="fileList.length === 0">Submit</el-button>
-        </el-form-item>
-      </el-form>
-    </el-main>
-  </el-container>
+  <div>
+    <el-upload
+      v-model:file-list="fileList"
+      :http-request="handleUploadWithAxios"
+      list-type="picture-card"
+      :on-preview="handlePictureCardPreview"
+      :on-remove="handleRemove"
+    >
+      <el-icon><Plus /></el-icon>
+    </el-upload>
+
+    <el-input v-model="customFileName" placeholder="请输入图片名" />
+
+    <el-dialog v-model="dialogVisible">
+      <img width="100%" :src="dialogImageUrl" alt="Preview Image" />
+    </el-dialog>
+
+  </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { ref } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { pictureUploadService } from '@/api/picture'
+import { Plus } from '@element-plus/icons-vue'
+import { ElInput } from 'element-plus'
 
-const fileList = ref([])
-const form = ref({
-  uploadedBy: '',
-  uploadDate: ''
+import type { UploadProps, UploadUserFile } from 'element-plus'
+import { pictureUploadService } from '@/api/picture'
+import { useUserInfoStore } from '@/stores/userInfo'
+
+const fileList = ref<UploadUserFile[]>([])
+
+const dialogImageUrl = ref('')
+const dialogVisible = ref(false)
+
+const customFileName = ref('')
+
+const userInfoStore = useUserInfoStore()
+const userInfo = ref({
+  ...userInfoStore.info
 })
 
-const handleRemove = (file:any, fileList:any) => {
-  console.log(file, fileList)
+const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
+  console.log(uploadFile, uploadFiles)
 }
 
-const handlePreview = (file:any) => {
-  console.log(file)
+const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
+  dialogImageUrl.value = uploadFile.url!
+  dialogVisible.value = true
 }
 
-const submitForm = () => {
+const handleUploadWithAxios: UploadProps['httpRequest'] = async ({ file }) => {
   const formData = new FormData()
-  fileList.value.forEach(file => {
-    formData.append('file', file.raw)
-  })
-  formData.append('uploadedBy', form.value.uploadedBy)
-  formData.append('uploadDate', form.value.uploadDate)
-  console.log(formData)
-  ElMessageBox.confirm(
-    '你确定要上传吗？',
-    '温馨提示',
-    {
-      confirmButtonText: '确认',
-      cancelButtonText: '取消',
-      type: 'warning'
+  formData.append('file', file)
+  formData.append('uploadedBy', userInfo.value.id) // 上传人
+  formData.append('customFileName', customFileName.value) // 自定义文件名
+
+  console.log(customFileName.value)
+
+  try {
+    const response = await pictureUploadService(formData)
+    if (response.status === 200) {
+      // const newFile = { name: file.name, url: response.data.data }
+      // fileList.value.push(newFile)
+      console.log('File uploaded successfully:', response.data)
     }
-  ).then(async () => {
-    let res = await pictureUploadService(formData)
-    ElMessage.success(res.data.message ? res.data.message : '上传成功')
-  }).catch(() => {
-    ElMessage({
-      type: 'info',
-      message: '用户取消上传'
-    })
-  })
-
-  clearForm()
-}
-
-const clearForm = () => {
-  form.value.uploadedBy = ''
-  form.value.uploadDate = ''
+  } catch (error) {
+    console.error('File upload failed:', error)
+  }
 }
 </script>
