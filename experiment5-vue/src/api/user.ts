@@ -23,3 +23,9 @@ export const userInfoService = () => {
 export const userPwdUpdateService = (pwdData: Data) => {
   return request.post('user/updatePwd', pwdData);
 }
+
+export const userSelectService = (userId: number) => {
+  return request.get('user/select', {
+    params: { userId }
+  });
+}

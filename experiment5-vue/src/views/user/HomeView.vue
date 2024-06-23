@@ -12,7 +12,7 @@
               <p>关注人数: {{ selectedUser.followingCount }}</p>
               <p>粉丝人数: {{ selectedUser.followerCount }}</p>
             </div>
-            <el-button type="primary" @click="goToUserProfile(selectedUser.id)">进入个人主页</el-button>
+            <el-button type="primary" @click="goToUserProfile(selectedUser.userName)">进入个人主页</el-button>
           </div>
         </el-card>
       </el-col>
@@ -27,7 +27,7 @@
                 <p>上传时间: {{ formatDate(photo.uploadTime) }}</p>
                 <p>
                   上传人:
-                  <el-link @click="selectUser(photo.user)">{{ photo.user.nickName }}</el-link>
+                  <el-link @click="selectUser(photo.userId)">{{ photo.uploadUserName}}</el-link>
                 </p>
               </div>
             </el-col>
@@ -49,44 +49,42 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-
-// 示例数据
-interface User {
-  id: string
-  userName: string
-  nickName: string
-  avatar: string
-  followingCount: number
-  followerCount: number
-}
+import { useUserInfoStore } from '@/stores/userInfo'
+import { userSelectService } from '@/api/user'
 
 interface Photo {
   id: string
   name: string
   url: string
   uploadTime: string
-  user: User
+  userId: number
+  uploadUserName: string
 }
 
 const photos = ref<Photo[]>([
   {
     id: '1',
     name: 'Photo 1',
-    url: 'https://via.placeholder.com/300',
+    url: '/api/static/e40ddf76-cdd5-48cb-84b4-1feec4fe49db-1.png',
     uploadTime: '2024-06-20T10:00:00',
-    user: {
-      id: 'user1',
-      userName: 'user1',
-      nickName: 'User One',
-      avatar: 'https://via.placeholder.com/100',
-      followingCount: 100,
-      followerCount: 200,
-    }
+    userId: 6,
+    uploadUserName: '胡仕豪'
   },
   // 更多照片数据...
 ])
 
-const selectedUser = ref<User>(photos.value[0].user)
+const userInfoStore = useUserInfoStore()
+
+const userInfo = ref ({
+  ...userInfoStore.info
+})
+
+const selectedUserId = ref(userInfo.value.id);
+const selectedUser = ref(userInfo.value)
+
+console.log(selectedUser.value)
+
+
 const pageSize = 6
 const currentPage = ref(1)
 
@@ -105,8 +103,10 @@ const handlePageChange = (page: number) => {
   currentPage.value = page
 }
 
-const selectUser = (user: User) => {
-  selectedUser.value = user
+const selectUser = async (id: number) => {
+  selectedUserId.value = id;
+  let res = await userSelectService(id);
+  selectedUser.value = res.data.data;
 }
 
 const router = useRouter()

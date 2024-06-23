@@ -55,7 +55,10 @@ const handleUploadWithAxios: UploadProps['httpRequest'] = async ({ file }) => {
   formData.append('uploadedBy', userInfo.value.id) // 上传人
   formData.append('customFileName', customFileName.value) // 自定义文件名
 
-  console.log(customFileName.value)
+  // Iterate over the FormData object
+  for (let [key, value] of formData.entries()) {
+    console.log(key, value);
+  }
 
   try {
     const response = await pictureUploadService(formData)
