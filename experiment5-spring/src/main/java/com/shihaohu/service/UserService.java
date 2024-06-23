@@ -15,4 +15,6 @@ public interface UserService {
     void updateUserInfo(User user);
 
     void updatePwd(String userName, String newPwd);
+
+    User select(int userId);
 }

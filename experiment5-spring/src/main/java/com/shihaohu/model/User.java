@@ -32,4 +32,8 @@ public class User {
     private String email;
     private String mobile;
     private String QQ;
+    private String avatar;
+    private Integer followerCount;
+    private Integer followingCount;
+
 }

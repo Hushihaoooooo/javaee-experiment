@@ -1,6 +1,7 @@
 package com.shihaohu.mapper;
 
 import com.shihaohu.model.User;
+import com.shihaohu.vo.UserVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -13,4 +14,6 @@ public interface UserMapper {
     void updateUserInfo(@Param("user") User user);
 
     void updatePwd(@Param("userName") String userName, @Param("newPwd") String newPwd);
+
+    User select(@Param("userId") int userId);
 }

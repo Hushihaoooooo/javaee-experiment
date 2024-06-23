@@ -55,4 +55,9 @@
         from user
         where username = #{userName}
     </select>
+    <select id="select" resultMap="userResultMap">
+        select *
+        from user
+        where id = #{userId}
+    </select>
 </mapper>

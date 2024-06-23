@@ -8,6 +8,7 @@ import com.shihaohu.model.User;
 import com.shihaohu.service.UserService;
 import com.shihaohu.utils.JwtUtil;
 import com.shihaohu.utils.Md5Util;
+import com.shihaohu.vo.UserVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -98,6 +99,12 @@ public class UserController {
         return Result.success();
     }
 
-
+    @GetMapping("/select")
+    public Result select(@RequestParam("userId") int userId) {
+        User u = userService.select(userId);
+        System.out.println(userId);
+        System.out.println("select" + u);
+        return Result.success(u);
+    }
 
 }
