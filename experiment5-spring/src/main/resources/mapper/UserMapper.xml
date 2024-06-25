@@ -40,6 +40,12 @@
             <if test="user.QQ != null">
                 QQ = #{user.QQ},
             </if>
+            <if test="user.followerCount != null">
+                follower_count = #{user.followerCount},
+            </if>
+            <if test="user.followingCount != null">
+                following_count = #{user.followingCount},
+            </if>
         </set>
 
         where username = #{user.userName}
@@ -59,5 +65,27 @@
         select *
         from user
         where id = #{userId}
+    </select>
+    <select id="getAll" resultType="com.shihaohu.model.Picture">
+        SELECT
+            p.id,
+            p.name,
+            p.url,
+            p.user_id,
+            p.intro,
+            p.tags,
+            p.upload_time,
+            p.click_num,
+            u.username AS uploadUserName
+        FROM
+            picture p
+                LEFT JOIN
+            user u ON p.user_id = u.id;
+
+    </select>
+    <select id="getList" resultType="com.shihaohu.model.Picture">
+        select *
+        from picture
+        where user_id = #{userId}
     </select>
 </mapper>

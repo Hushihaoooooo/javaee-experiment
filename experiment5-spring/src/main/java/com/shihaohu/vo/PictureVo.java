@@ -13,7 +13,7 @@ import java.util.Date;
 public class PictureVo {
     private Long id;
     private String name;
-    private String fname;
+    private String url;
     private Long userId;
     private String intro;
     private String tags;

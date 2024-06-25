@@ -1,17 +1,16 @@
 package com.shihaohu.controller;
 
+import com.shihaohu.model.Picture;
 import com.shihaohu.model.Result;
 import com.shihaohu.service.PictureService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -76,6 +75,19 @@ public class PictureController {
         }
     }
 
+
+    @GetMapping("/getAll")
+    public Result getAll() {
+        List<Picture> pictures =  pictureService.getAll();
+        return Result.success(pictures);
+    }
+
+    @GetMapping("/getList")
+    public Result getList(@RequestParam("userId") Integer userId) {
+        List<Picture> pictures =  pictureService.getList(userId);
+        System.out.println("getList" + pictures);
+        return Result.success(pictures);
+    }
 
 
 
