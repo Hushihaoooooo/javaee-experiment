@@ -19,15 +19,15 @@
       <el-col :span="16">
         <!-- 图片列表部分 -->
         <el-card class="photo-card">
-          <el-row :gutter="20" v-for="photo in paginatedPhotos" :key="photo.id">
-            <el-col :span="8">
+          <el-row :gutter="20">
+            <el-col v-for="photo in paginatedPhotos" :key="photo.id" :span="8">
               <el-image :src="photo.url" class="photo" />
               <div class="photo-info">
                 <p>照片名称: {{ photo.name }}</p>
                 <p>上传时间: {{ formatDate(photo.uploadTime) }}</p>
                 <p>
                   上传人:
-                  <el-link @click="selectUser(photo.userId)">{{ photo.uploadUserName}}</el-link>
+                  <el-link @click="selectUser(photo.userId)">{{ photo.uploadUserName }}</el-link>
                 </p>
               </div>
             </el-col>
@@ -51,6 +51,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserInfoStore } from '@/stores/userInfo'
 import { userSelectService } from '@/api/user'
+import { pictureGetAllService } from '@/api/picture'
 
 interface Photo {
   id: string
@@ -68,22 +69,29 @@ const photos = ref<Photo[]>([
     url: '/api/static/e40ddf76-cdd5-48cb-84b4-1feec4fe49db-1.png',
     uploadTime: '2024-06-20T10:00:00',
     userId: 6,
-    uploadUserName: '胡仕豪'
+    uploadUserName: 'hushihao'
   },
   // 更多照片数据...
 ])
 
 const userInfoStore = useUserInfoStore()
 
-const userInfo = ref ({
+const userInfo = ref({
   ...userInfoStore.info
 })
 
-const selectedUserId = ref(userInfo.value.id);
+const selectedUserId = ref(userInfo.value.id)
 const selectedUser = ref(userInfo.value)
 
 console.log(selectedUser.value)
 
+const getPictureList = async () => {
+  let res = await pictureGetAllService()
+  console.log(res.data)
+  photos.value = res.data.data
+}
+
+getPictureList()
 
 const pageSize = 6
 const currentPage = ref(1)
@@ -104,9 +112,9 @@ const handlePageChange = (page: number) => {
 }
 
 const selectUser = async (id: number) => {
-  selectedUserId.value = id;
-  let res = await userSelectService(id);
-  selectedUser.value = res.data.data;
+  selectedUserId.value = id
+  let res = await userSelectService(id)
+  selectedUser.value = res.data.data
 }
 
 const router = useRouter()
@@ -153,11 +161,9 @@ const goToUserProfile = (userName: string) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 250px; /* 保持图片列高度一致 */
 }
 
 .el-container {
   padding: 20px;
 }
 </style>
-

@@ -7,3 +7,14 @@ export const pictureUploadService = (uploadData: any) => {
     }
   });
 }
+
+export const pictureGetAllService = () => {
+  return request.get('picture/getAll');
+}
+
+export const pictureGetListService = (userId:number) => {
+  return request.get('picture/getList', {
+    params: { userId }
+  });
+}
+
