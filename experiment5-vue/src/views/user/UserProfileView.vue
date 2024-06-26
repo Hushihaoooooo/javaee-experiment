@@ -16,7 +16,7 @@
             <el-button v-if="!isCurrentUser" type="primary" @click="toggleFollow">
               {{ user.isFollowing ? '取消关注' : '关注' }}
             </el-button>
-            <el-button v-if="isCurrentUser" disabled>编辑个人资料</el-button>
+            <el-button v-if="isCurrentUser" @click="goToUserInfo">编辑个人资料</el-button>
           </div>
         </el-card>
       </el-col>
@@ -47,16 +47,16 @@
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { pictureGetListService } from '@/api/picture'
 import { useUserInfoStore } from '@/stores/userInfo'
-import { userInfoUpdateService } from '@/api/user'
+import { userInfoUpdateService, userSelectService } from '@/api/user'
+import { addConcernService, checkConcernService, deleteConcernService } from '@/api/concern'
 
 interface Photo {
   [key: string]: any
 }
-
 
 const userInfoStore = useUserInfoStore()
 
@@ -65,19 +65,28 @@ const userInfo = ref({
 })
 
 const user = ref(userInfo.value)
+const route = useRoute()
 
+const getUser = async () => {
+  let res = await userSelectService(Number(route.params.id))
+  console.log("test userProfileView getUser")
+  user.value = res.data.data
+  console.log(user.value)
+  await getPictureList()
+}
+getUser()
 
-// 模拟从服务器获取用户的照片
 const userPhotos = ref<Photo[]>([])
 
-console.log('dudu' + user.value.id)
 const getPictureList = async () => {
   let res = await pictureGetListService(user.value.id)
+  console.log(user.value.id)
   console.log(res.data)
   userPhotos.value = res.data.data
+  await checkFollow()
 }
 
-getPictureList()
+
 
 
 const pageSize = 6
@@ -104,48 +113,38 @@ const handlePageChange = (page: number) => {
   currentPage.value = page
 }
 
-
-// 模拟 API 请求获取用户数据
-// 实际上需要用 axios 或者 fetch 发起请求
-// 示例数据
-const route = useRoute()
-console.log(route.params.userName)
-user.value.userName = route.params.userName as string
-
-// userPhotos.value = [
-//   {
-//     id: '1',
-//     name: 'Photo 1',
-//     url: 'https://via.placeholder.com/300',
-//     uploadTime: '2024-06-20T10:00:00',
-//     userId: userId
-//   },
-//   // 更多照片数据...
-// ]
-
-const toggleFollow = () => {
-  if (user.value.isFollowing) {
-    // 调用取消关注逻辑
-    // 示例：此处需要调用 API 取消关注
-    // 模拟成功
-    user.value.isFollowing = false
-    user.value.followerCount--
-    ElMessage.success('取消关注成功')
-  } else {
-    // 调用关注逻辑
-    // 示例：此处需要调用 API 关注
-    // 模拟成功
-    user.value.isFollowing = true
-    user.value.followerCount++
-    ElMessage.success('关注成功')
-  }
-  userInfoUpdateService(user.value)
+const checkFollow = async () => {
+  let res = await checkConcernService(user.value.id)
+  console.log("checkFollow")
+  //console.log(res.data)
+  user.value.isFollowing = res.data.data
 }
 
-// const isCurrentUser = computed(() => {
-//   // 根据实际情况判断当前用户是否为该用户，以确定是否显示编辑个人资料按钮
-//   return userId === 'currentUserId' // 假设 'currentUserId' 是当前用户的 ID
-// })
+
+const toggleFollow = async () => {
+  if (user.value.isFollowing) {
+    user.value.isFollowing = false
+    user.value.followerCount--
+    await deleteConcernService(user.value.id)
+    ElMessage.success('取消关注成功')
+  } else {
+    user.value.isFollowing = true
+    user.value.followerCount++
+    await addConcernService(user.value.id)
+    ElMessage.success('关注成功')
+  }
+  await userInfoUpdateService(user.value)
+}
+
+
+const router = useRouter()
+const goToUserInfo = async () => {
+  await router.push('/userInfo')
+}
+
+const isCurrentUser = computed(() => {
+  return user.value.id === userInfo.value.id // 假设 'currentUserId' 是当前用户的 ID
+})
 
 </script>
 

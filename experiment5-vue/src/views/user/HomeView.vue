@@ -12,16 +12,22 @@
               <p>关注人数: {{ selectedUser.followingCount }}</p>
               <p>粉丝人数: {{ selectedUser.followerCount }}</p>
             </div>
-            <el-button type="primary" @click="goToUserProfile(selectedUser.userName)">进入个人主页</el-button>
+            <el-button type="primary" @click="goToUserProfile(selectedUserId)">进入个人主页</el-button>
           </div>
         </el-card>
       </el-col>
       <el-col :span="16">
         <!-- 图片列表部分 -->
         <el-card class="photo-card">
+          <!-- 搜索用户 -->
+          <el-input v-model="searchUserName" placeholder="搜索用户名" clearable @click="searchUser" />
+          <el-button type="primary" @click="searchUser">搜索</el-button>
+          <!-- 搜索图片 -->
+          <el-input v-model="searchPhotoName" placeholder="搜索照片名称" clearable @click="searchPhoto" />
+          <el-button type="primary" @click="searchPhoto">搜索</el-button>
           <el-row :gutter="20">
             <el-col v-for="photo in paginatedPhotos" :key="photo.id" :span="8">
-              <el-image :src="photo.url" class="photo" />
+              <el-image :src="photo.url" class="photo" :preview-src-list="previewSrcList" />
               <div class="photo-info">
                 <p>照片名称: {{ photo.name }}</p>
                 <p>上传时间: {{ formatDate(photo.uploadTime) }}</p>
@@ -35,7 +41,7 @@
           <el-pagination
             background
             layout="prev, pager, next"
-            :total="photos.length"
+            :total="filteredPhotos.length"
             :page-size="pageSize"
             @current-change="handlePageChange"
           />
@@ -50,7 +56,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserInfoStore } from '@/stores/userInfo'
-import { userSelectService } from '@/api/user'
+import { userSearchService, userSelectService } from '@/api/user'
 import { pictureGetAllService } from '@/api/picture'
 
 interface Photo {
@@ -83,7 +89,7 @@ const userInfo = ref({
 const selectedUserId = ref(userInfo.value.id)
 const selectedUser = ref(userInfo.value)
 
-console.log(selectedUser.value)
+console.log(selectedUserId.value)
 
 const getPictureList = async () => {
   let res = await pictureGetAllService()
@@ -99,7 +105,7 @@ const currentPage = ref(1)
 const paginatedPhotos = computed(() => {
   const start = (currentPage.value - 1) * pageSize
   const end = start + pageSize
-  return photos.value.slice(start, end)
+  return filteredPhotos.value.slice(start, end)
 })
 
 const formatDate = (dateString: string) => {
@@ -118,11 +124,39 @@ const selectUser = async (id: number) => {
 }
 
 const router = useRouter()
-const goToUserProfile = (userName: string) => {
-  router.push(`/userProfile/${userName}`).catch(err => {
+const goToUserProfile = (id: number) => {
+  router.push(`/userProfile/${id}`).catch(err => {
     ElMessage.error('导航到用户主页失败: ' + err.message)
   })
 }
+
+// 搜索用户功能
+const searchUserName = ref('')
+const searchUser = async () => {
+  try {
+    let res = await userSearchService(searchUserName.value)
+    selectedUser.value = res.data.data
+    selectedUserId.value = res.data.data.id
+  } catch (error) {
+    ElMessage.error('搜索用户失败')
+  }
+}
+
+// 搜索图片功能
+const searchPhotoName = ref('')
+const filteredPhotos = computed(() => {
+  if (!searchPhotoName.value) {
+    return photos.value
+  }
+  return photos.value.filter(photo => photo.name.includes(searchPhotoName.value))
+})
+
+const searchPhoto = () => {
+  currentPage.value = 1 // 搜索后重置分页到第一页
+}
+
+// 图片预览
+const previewSrcList = computed(() => photos.value.map(photo => photo.url))
 </script>
 
 <style scoped>

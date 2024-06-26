@@ -63,7 +63,7 @@ const login = async () => {
 
   let res = await userLoginService(registerData.value)
 
-  console.log(res.data);
+  console.log("login successful");
 
   if (res.data.code === 0) {
     ElMessage.success('登录成功')

@@ -29,3 +29,18 @@ export const userSelectService = (userId: number) => {
     params: { userId }
   });
 }
+
+export const userSearchService = (userName:String) => {
+  return request.get('user/search', {
+    params: { userName }
+  })
+}
+
+export const avatarUploadService = (uploadData: any) => {
+  return request.post('user/uploadAvatar', uploadData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+}
+

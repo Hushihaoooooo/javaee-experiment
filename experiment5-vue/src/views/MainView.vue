@@ -11,7 +11,7 @@ const userInfoStore = useUserInfoStore();
 
 const getUserInfo = async () => {
   let res = await  userInfoService();
-  console.log(res.data.data);
+  console.log("getUserInfo successful");
   userInfoStore.setInfo(res.data.data)
 }
 
@@ -59,6 +59,10 @@ const handleSelect = (index : string) => {
           <el-menu-item index="/resetPassword">修改密码</el-menu-item>
           <el-menu-item index="/upload">上传照片</el-menu-item>
           <el-menu-item index="/login">退出登录</el-menu-item>
+          <!-- 添加头像并居中 -->
+          <div class="avatar-container">
+            <el-avatar :src="userInfoStore.info.avatar"  class="avatar"></el-avatar>
+          </div>
         </el-menu>
       </el-header>
       <el-main style="height: 750px;">
@@ -80,6 +84,11 @@ const handleSelect = (index : string) => {
 .el-menu-demo .el-menu-item {
   width: 150px; /* 设置菜单项的统一宽度 */
   text-align: center; /* 居中文本 */
+}
+.avatar-container {
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
 }
 
 </style>

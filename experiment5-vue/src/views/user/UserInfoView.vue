@@ -2,19 +2,29 @@
   <el-card style="max-width: 480px">
     <template #header>个人信息</template>
     <el-form :model="userInfo" label-width="auto" style="max-width: 600px">
+      <el-form-item label="头像" prop="avatar">
+        <el-upload
+          class="avatar-uploader"
+          :http-request="handleUploadWithAxios"
+          :show-file-list="false"
+          :before-upload="beforeAvatarUpload"
+        >
+          <img v-if="userInfo.avatar" :src="userInfo.avatar" class="avatar" />
+          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+        </el-upload>
+      </el-form-item>
       <el-form-item label="用户名" prop="userName">
         <el-input v-model="userInfo.userName" disabled />
       </el-form-item>
       <el-form-item label="姓名" prop="nickName">
         <el-input v-model="userInfo.nickName" placeholder="还未完善" />
       </el-form-item>
-      <el-form-item label="姓别" prop="gender">
+      <el-form-item label="性别" prop="gender">
         <el-radio-group v-model="userInfo.gender" class="ml-4">
           <el-radio :value="0">男</el-radio>
           <el-radio :value="1">女</el-radio>
         </el-radio-group>
       </el-form-item>
-
       <el-form-item label="省份">
         <el-select v-model="userInfo.province" placeholder="请选择省份" @change="handleProvinceChange">
           <el-option
@@ -60,16 +70,15 @@
     </el-form>
   </el-card>
 </template>
-
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import { userInfoService, userInfoUpdateService } from '@/api/user'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { avatarUploadService, userInfoService, userInfoUpdateService } from '@/api/user'
+import { ElMessage, ElMessageBox, type UploadFile, type UploadProps } from 'element-plus'
 import { useUserInfoStore } from '@/stores/userInfo'
+import { pictureUploadService } from '@/api/picture'
 
 const userInfoStore = useUserInfoStore()
 
-// do not use same name with ref
 const userInfo = ref({
   ...userInfoStore.info
 })
@@ -113,7 +122,7 @@ const citiesData: CitiesData = {
   '青海': ['西宁市', '海东市'],
   '西藏': ['拉萨市', '日喀则市', '昌都市', '林芝市', '山南市'],
   '新疆': ['乌鲁木齐市', '克拉玛依市', '吐鲁番市', '哈密市', '阿克苏市'],
-  '甘肃': ['兰州市', '嘉峪关市', '金昌市', '白银市', '天水市'],
+  '甘肃': ['兰州市', '嘉峪关市', '金昌市', '白银市', '天水市']
 }
 
 const cities = ref<string[]>([])
@@ -128,14 +137,12 @@ const handleProvinceChange = (value: string) => {
   userInfo.value.city = '' // 清空城市选择
 }
 const getUserInfo = async () => {
-  let res = await  userInfoService();
-  console.log(res.data.data);
+  let res = await userInfoService()
   userInfoStore.setInfo(res.data.data)
 }
 getUserInfo()
+
 const updateUserInfo = async () => {
-  console.log("dudu")
-  console.log(userInfo.value)
   ElMessageBox.confirm(
     '你确定要修改个人信息吗？',
     '温馨提示',
@@ -155,4 +162,63 @@ const updateUserInfo = async () => {
   })
   await getUserInfo()
 }
+
+const beforeAvatarUpload = (file: File) => {
+  const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
+  const isLt2M = file.size / 1024 / 1024 < 2
+
+  if (!isJPG) {
+    ElMessage.error('上传头像图片只能是 JPG 或 PNG 格式!')
+  }
+  if (!isLt2M) {
+    ElMessage.error('上传头像图片大小不能超过 2MB!')
+  }
+  return isJPG && isLt2M
+}
+
+const handleUploadWithAxios: UploadProps['httpRequest'] = async ({ file }) => {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('uploadedBy', userInfo.value.id)
+  try {
+    const response = await avatarUploadService(formData)
+    userInfo.value.avatar = response.data.data
+    ElMessage.success('头像上传成功')
+    if (response.status === 200) {
+      console.log('File uploaded successfully:', response.data)
+    }
+  } catch (error) {
+    console.error('File upload failed:', error)
+  }
+}
+
+
 </script>
+
+<style scoped>
+.avatar-uploader {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+  position: relative;
+  cursor: pointer;
+  border: 1px dashed #d9d9d9;
+  border-radius: 50%;
+}
+
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 80px;
+  height: 80px;
+  line-height: 80px;
+  text-align: center;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 50%;
+}
+</style>

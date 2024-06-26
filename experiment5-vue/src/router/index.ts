@@ -14,7 +14,7 @@ const routes = [{
     {path: '/home', component: HomeVue},
     {path: '/userInfo', component: UserInfoVue},
     {path: '/resetPassword', component: UserResetPasswordVue},
-    {path: '/userProfile/:userName', component: UserProfileVue, props: true},
+    {path: '/userProfile/:id', component: UserProfileVue, props: true},
     {path: '/upload', component: PictureUploadVue},
   ]
 }
