@@ -49,4 +49,10 @@ public class UserServiceImpl implements UserService {
         User u = userMapper.select(userId);
         return u;
     }
+
+    @Override
+    public void updateAvatar(String userId, String url) {
+        System.out.println("updateAvatar" + userId + url);
+        userMapper.updateAvatar(userId, url);
+    }
 }

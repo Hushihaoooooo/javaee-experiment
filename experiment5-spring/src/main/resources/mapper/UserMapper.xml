@@ -55,6 +55,11 @@
         set password = #{newPwd}
         where username = #{userName}
     </update>
+    <update id="updateAvatar">
+        update user
+        set avatar = #{url}
+        where id = #{userId}
+    </update>
 
     <select id="findByUserName" resultMap="userResultMap">
         select *

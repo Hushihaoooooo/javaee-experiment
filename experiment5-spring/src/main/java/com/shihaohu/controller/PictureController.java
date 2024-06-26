@@ -47,8 +47,8 @@ public class PictureController {
 
         try {
             // Generate unique file name
-            String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
-            String filePath = Paths.get(UPLOAD_DIR, fileName).toString();
+            String url = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
+            String filePath = Paths.get(UPLOAD_DIR, url).toString();
 
             // Create directory if not exists
             File dir = new File(UPLOAD_DIR);
@@ -65,10 +65,11 @@ public class PictureController {
             // Log metadata
             System.out.println("Uploaded by: " + uploadedBy);
 
+            url = "/api/static/" + url;
 
-            pictureService.upload(uploadedBy, fileName, customFileName);
+            pictureService.upload(uploadedBy, url, customFileName);
 
-            return Result.success(fileName);
+            return Result.success(url);
 
         } catch (IOException e) {
             return Result.error("操作失败");
@@ -85,6 +86,7 @@ public class PictureController {
     @GetMapping("/getList")
     public Result getList(@RequestParam("userId") Integer userId) {
         List<Picture> pictures =  pictureService.getList(userId);
+        System.out.println(userId);
         System.out.println("getList" + pictures);
         return Result.success(pictures);
     }

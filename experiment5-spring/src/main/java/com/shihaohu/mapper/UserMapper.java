@@ -23,4 +23,6 @@ public interface UserMapper {
     List<Picture> getAll();
 
     List<Picture> getList(@Param("userId") Integer userId);
+
+    void updateAvatar(@Param("userId") String userId, @Param("url") String url);
 }

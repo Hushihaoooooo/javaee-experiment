@@ -5,7 +5,7 @@
 <mapper namespace="com.shihaohu.mapper.PictureMapper">
 
     <insert id="upload">
-        insert into picture(name, fname, user_id, upload_time)
+        insert into picture(name, url, user_id, upload_time)
         values(#{customFileName}, #{fileName}, #{uploadedBy}, now())
     </insert>
 </mapper>

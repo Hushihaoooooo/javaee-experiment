@@ -14,12 +14,12 @@ import java.util.Date;
  */
 @Data
 public class User {
-    //@NotNull
+    @NotNull
     private Integer id;
-    //@NotNull
+    @NotNull
     private String userName;
-    //@JsonIgnore
-    //@Pattern(regexp = "^\\S{5,16}$")
+    @JsonIgnore
+    @Pattern(regexp = "^\\S{5,16}$")
     private String password;
     private String nickName;
     private String intro;

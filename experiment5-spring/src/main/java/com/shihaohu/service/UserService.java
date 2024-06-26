@@ -17,4 +17,6 @@ public interface UserService {
     void updatePwd(String userName, String newPwd);
 
     User select(int userId);
+
+    void updateAvatar(String userId, String url);
 }

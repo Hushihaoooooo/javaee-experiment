@@ -11,10 +11,15 @@ import com.shihaohu.utils.Md5Util;
 import com.shihaohu.vo.UserVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author Shihaohu
@@ -25,6 +30,8 @@ import java.util.Map;
 public class UserController {
     @Resource
     private UserService userService;
+
+    private static final String UPLOAD_DIR = "E:/ProjectFile/";
 
     @PostMapping("/register")
     public Result register(@RequestBody User user) {
@@ -105,6 +112,67 @@ public class UserController {
         System.out.println(userId);
         System.out.println("select" + u);
         return Result.success(u);
+    }
+
+    @GetMapping("/search")
+    public Result search(@RequestParam("userName") String userName) {
+        User u = userService.findByUsername(userName);
+        return Result.success(u);
+    }
+
+    @PostMapping("/uploadAvatar")
+    public Result uploadFile(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("uploadedBy") String uploadedBy) {
+        System.out.println("dudu2");
+
+
+        if (file.isEmpty()) {
+            return Result.error("Please upload a file");
+        }
+
+        // Check file size
+        if (file.getSize() > 500 * 1024) {
+            return Result.error("File size exceeds limit");
+        }
+
+        // Check file type
+        String fileType = file.getContentType();
+        if (!fileType.equals("image/jpeg") && !fileType.equals("image/png")) {
+            return Result.error("Only jpg/png files are supported");
+        }
+
+
+        try {
+            // Generate unique file name
+            String url = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
+            String filePath = Paths.get(UPLOAD_DIR, url).toString();
+
+            // Create directory if not exists
+            File dir = new File(UPLOAD_DIR);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            System.out.println("dudula" + filePath);
+
+            // Save file
+            file.transferTo(new File(filePath));
+
+            // Log metadata
+
+            url = "/api/static/" + url;
+
+            userService.updateAvatar(uploadedBy, url);
+//
+//            Map<String, Object> m  = new HashMap<>();
+//            m.put("url", url);
+
+            return Result.success();
+
+        } catch (IOException e) {
+            return Result.error("操作失败");
+        }
     }
 
 }
